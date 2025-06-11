@@ -1,4 +1,7 @@
+import bcrypt from "bcrypt";
 import User from "../models/user.js";
+import jwt from "jsonwebtoken";
+
 
 export const HTTPResponses = {
   Successful: {
@@ -25,16 +28,30 @@ export const HTTPResponses = {
 
 export const validateRegistration = async (user) => {
   const { username, password, role } = user;
+
   if (!username || !password || !role) {
     return HTTPResponses["MissingFields"];
-  } else {
-    if (await User.findOne({ username: username })) {
-      return HTTPResponses["UsernameExists"];
-    } else {
-      return HTTPResponses["Created"];
-    }
   }
+
+  const exists = await User.findOne({ username: username });
+  if (exists) {
+    return HTTPResponses["UsernameExists"];
+  }
+
+  const createdUser = await User.create({
+  username,
+  password, 
+  role,
+});
+
+  return {
+    successful: true,
+    statusCode: 201,
+    message: "User created successfully.",
+    user: createdUser,
+  };
 };
+
 
 export const validateLogin = async (username, password) => {
   if (!username || !password) {
@@ -63,3 +80,27 @@ export const validateLogin = async (username, password) => {
     user,
   };
 };
+
+const SECRET = process.env.JWT_SECRET || 'supersecret123';
+
+export async function registerUser(username, password, role) {
+  if (!username || !password || !role) throw new Error('Missing credentials');
+
+  const exists = await User.findOne({ username });
+  if (exists) throw new Error('Username already exists');
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({ username, password: hashedPassword, role });
+  return user;
+}
+
+export async function loginUser(username, password) {
+  const user = await User.findOne({ username });
+  if (!user) throw new Error('User not found');
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error('Invalid password');
+
+  const token = jwt.sign({ userId: user.userId, role: user.role }, SECRET, { expiresIn: '1h' });
+  return { token, user };
+}

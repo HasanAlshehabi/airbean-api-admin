@@ -11,17 +11,14 @@ export async function getOrdersByUserId(userId) {
 
 export async function createOrder(cartId) {
   const cart = await Cart.findOne({ cartId });
-  if (!cart) throw new Error("Invalid cart ID");
+  if (!cart) throw new Error('Invalid cart ID');
 
-  const total = cart.items.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+  const total = cart.items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   const order = await Order.create({
     userId: cart.userId,
     items: cart.items,
-    total,
+    total
   });
 
   await Cart.findOneAndDelete({ cartId });

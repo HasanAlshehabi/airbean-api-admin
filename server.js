@@ -2,6 +2,7 @@ import authRouter from "./routes/auth.js";
 import orderRouter from "./routes/orders.js";
 import productsRouter from "./routes/products.js";
 import cartRouter from "./routes/cart.js";
+import adminMenuRouter from "./routes/adminmenu.js";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
@@ -18,6 +19,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
+app.use("/api/adminmenu", adminMenuRouter);
 
 mongoose.connect(process.env.MONGODB_URI);
 const db = mongoose.connection;

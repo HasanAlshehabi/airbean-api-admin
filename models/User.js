@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -13,7 +14,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minLength: 5,
-    maxLength: 20,
   },
   role: {
     type: [String],

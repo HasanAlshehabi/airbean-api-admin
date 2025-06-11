@@ -1,71 +1,38 @@
-import express from "express";
+import express from 'express';
 import { updateCart, getCartByUserId, getCartById } from "../services/cart.js";
-import { getActiveUserId } from "../globalActiveUser/globalActiveUser.js";
-import { requireAuth } from "../middleware/authorization.js";
+import { verifyToken } from '../middleware/adminAuth.js';
+
 const router = express.Router();
 
-// GET all carts
-router.get("/", requireAuth, async (req, res) => {
-  try {
-    const userId = getActiveUserId();
-    const cart = await getCartByUserId(userId);
-    res.json(cart);
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "No cart could be found",
-    });
-  }
+router.get('/', verifyToken, async (req, res) => {
+  const userId = req.user.userId;
+  const cart = await getCartByUserId(userId);
+  res.json(cart);
 });
 
-// Hämta cart med given cartId
-router.get("/:cartId", requireAuth, async (req, res) => {
-  try {
-    const cart = await getCartById(req.params.cartId);
-    if (!cart) {
-      res.status(400).json({
-        success: false,
-        message: "No cart was found with provided ID",
-      });
-    }
-    res.json(cart);
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Could not get the Cart",
-    });
-  }
+router.get('/:cartId', verifyToken, async (req, res) => {
+  const cart = await getCartById(req.params.cartId);
+  if (!cart) return res.status(404).json({ error: 'Cart not found' });
+  res.json(cart);
 });
 
-// PUT
-router.put("/", async (req, res) => {
+router.put('/', verifyToken, async (req, res) => {
   try {
     const { guestId, prodId, qty } = req.body;
-    const activeUserId = getActiveUserId();
-
-    const { cart, isGuest } = await updateCart(
-      activeUserId,
-      guestId,
-      prodId,
-      qty
-    );
+    const activeUserId = req.user.userId;
+    const { cart, isGuest } = await updateCart(activeUserId, guestId, prodId, qty);
 
     const response = {
-      message: "Cart updated successfully",
-      cart,
+      message: 'Cart updated successfully',
+      cart
     };
-
     if (isGuest) {
       response.guestId = cart.userId;
     }
 
     res.json(response);
   } catch (error) {
-    console.log("ERROR:", error.message);
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ error: error.message });
   }
 });
 

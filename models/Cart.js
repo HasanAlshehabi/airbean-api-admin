@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { getActiveUser } from "../globalActiveUser/globalActiveUser.js";
 import { v4 as uuidv4 } from "uuid";
 
 const cartSchema = new mongoose.Schema(
@@ -14,10 +13,10 @@ const cartSchema = new mongoose.Schema(
     ],
 
     userId: {
-      default: () => getActiveUser(),
       type: String,
       required: true,
     },
+
     cartId: {
       type: String,
       required: true,
@@ -29,6 +28,7 @@ const cartSchema = new mongoose.Schema(
     toJSON: {
       transform: function (doc, ret) {
         delete ret._id;
+        delete ret.__v;
         return ret;
       },
     },

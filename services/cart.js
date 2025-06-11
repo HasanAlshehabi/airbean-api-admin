@@ -3,7 +3,7 @@ import Product from "../models/product.js";
 
 export async function updateCart(activeUserId, guestId, prodId, qty) {
   const product = await Product.findOne({ prodId });
-  if (!product) throw new Error("Invalid product ID");
+  if (!product) throw new Error('Invalid product ID');
 
   let userId = activeUserId || guestId;
   let isGuest = false;
@@ -16,9 +16,7 @@ export async function updateCart(activeUserId, guestId, prodId, qty) {
   let cart = await Cart.findOne({ userId });
   if (!cart) cart = await Cart.create({ userId, items: [] });
 
-  const existingItemIndex = cart.items.findIndex(
-    (item) => item.prodId === prodId
-  );
+  const existingItemIndex = cart.items.findIndex(item => item.prodId === prodId);
 
   if (existingItemIndex !== -1) {
     if (qty <= 0) {
@@ -26,15 +24,8 @@ export async function updateCart(activeUserId, guestId, prodId, qty) {
     } else {
       cart.items[existingItemIndex].qty = qty;
     }
-  } else {
-    if (qty > 0) {
-      cart.items.push({
-        prodId,
-        title: product.title,
-        price: product.price,
-        qty,
-      });
-    }
+  } else if (qty > 0) {
+    cart.items.push({ prodId, title: product.title, price: product.price, qty });
   }
 
   await cart.save();
@@ -46,5 +37,6 @@ export async function getCartByUserId(userId) {
 }
 
 export async function getCartById(cartId) {
-  return await Cart.findOne({ cartId });
+  return await Cart.findById(cartId);
 }
+
