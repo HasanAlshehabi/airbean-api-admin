@@ -7,12 +7,16 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import errorHandler from "./middleware/errorHandler.js";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
+const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //routes
 app.use("/api/auth", authRouter);
@@ -30,6 +34,7 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+     console.log(`Swagger available at http://localhost:${PORT}/api-docs`);
   });
 });
 // ErrorHandling

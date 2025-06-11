@@ -1,0 +1,166 @@
+openapi : 3.0.0
+info:
+  title: AirBean API Admin
+  version: 1.0.0
+  description: API for managing AirBean services and user authentication.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: array
+          items:
+            type: string
+
+    Product:
+      type: object
+      required:
+        - title
+        - desc
+        - price
+      properties:
+        title:
+          type: string
+        desc:
+          type: string
+        price:
+          type: number
+        prodId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        modifiedAt:
+          type: string
+          format: date-time
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: User registered
+        400:
+          description: Missing or invalid data
+        409:
+          description: Username already exists
+
+  /api/auth/login:
+    post:
+      summary: Log in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Returns JWT token and user info
+        401:
+          description: Invalid credentials
+
+  /api/adminmenu/add:
+    post:
+      summary: Add new product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - title
+                - desc
+                - price
+              properties:
+                title:
+                  type: string
+                desc:
+                  type: string
+                price:
+                  type: number
+      responses:
+        201:
+          description: Product created
+        400:
+          description: Missing or invalid fields
+        403:
+          description: Admin access required
+
+  /api/adminmenu/update/{prodId}:
+    put:
+      summary: Update a product
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: prodId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                title:
+                  type: string
+                desc:
+                  type: string
+                price:
+                  type: number
+      responses:
+        200:
+          description: Product updated
+        404:
+          description: Product not found
+        403:
+          description: Admin access required
+
+  /api/adminmenu/delete/{prodId}:
+    delete:
+      summary: Delete a product
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: prodId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Product deleted
+        404:
+          description: Product not found
+        403:
+          description: Admin access required
