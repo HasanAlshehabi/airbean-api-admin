@@ -29,11 +29,6 @@ Du kan använda er befintliga gruppkod som grund, eller välja att börja om med
 6. Ni som skall komplettera gruppexaminationen hittar era instruktioner längst ner i dokumentationen ovan, under avsnittet **"Komplettering"**.  
    Övriga får naturligtvis också göra dessa uppgifter om man så önskar.
 
-**Ge läraren:**
-- Network Access till din databas (**IP: 2.248.92.11**)
-- Din **Connection String** både för Compass och Drivers – skriv dem i en kommentar i din inlämning (lägg även in kontouppgifterna för den användare ni skapar åt mig).  
-  _(Se till att fixa detta då jag inte kommer påminna er, missar ni blir det komplettering)_
-
 ---
 
 ## ✅ Krav för Godkänt
